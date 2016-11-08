@@ -24,11 +24,16 @@ public class Main {
             b.option(ChannelOption.SO_BACKLOG, 1024);
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ServerInitializer());
+                    .childHandler(new ServerInitializer(backpressureEnabled));
 
             if(backpressureEnabled)
             {
-                b.childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, WriteBufferWaterMark.DEFAULT);
+//                b.childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, WriteBufferWaterMark.DEFAULT);
+
+                b.childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(
+                        16 * 1024,
+                        32 * 1024
+                ));
             }
 
             Channel ch = b.bind(8080).sync().channel();

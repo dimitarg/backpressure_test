@@ -18,6 +18,13 @@ import java.util.List;
 public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
 
+    private final boolean enableBackPressure;
+
+    public ServerHandler(boolean enableBackPressure)
+    {
+        this.enableBackPressure = enableBackPressure;
+    }
+
     private static final OptimizedJacksonEncoder ENC = new OptimizedJacksonEncoder(PooledByteBufAllocator.DEFAULT);
     private static final FullHttpResponse BAD_REQ = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST);
 
@@ -25,16 +32,43 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         BAD_REQ.headers().add(HttpHeaderNames.CONTENT_LENGTH, 0);
     }
 
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+
+
+        if(enableBackPressure)
+        {
+            boolean writable = ctx.channel().isWritable();
+            ctx.channel().config().setAutoRead(writable);
+
+            //        String msg = writable ? "writability changed to true. Bytes before unwritable: " + ctx.channel().bytesBeforeUnwritable() :
+            //                "writability changed to false, bytes before writable: " + ctx.channel().bytesBeforeWritable();
+            //        System.out.println(msg)
+        }
+
+
+;
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
 
 
+        if(!ctx.channel().config().isAutoRead())
+        {
+            System.err.println("autoread is false in channelRead0");
+        }
+
+        if(!ctx.channel().isWritable())
+        {
+            System.err.println("channel is not writable in channelRead0");
+        }
+
         QueryStringDecoder d = new QueryStringDecoder(msg.uri());
         List<String> sizeParam = d.parameters().get("size");
 
         if (sizeParam == null || sizeParam.size() == 0) {
-            ctx.channel().writeAndFlush(BAD_REQ.copy());
+            ctx.writeAndFlush(BAD_REQ.copy());
             return;
         }
 
@@ -49,11 +83,17 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
                 result.add(new Bean(i, String.valueOf(i)));
             }
 
-            ctx.channel().writeAndFlush(ok(result),
+            FullHttpResponse resp = ok(result);
+            if(!ctx.channel().isWritable())
+            {
+                System.err.println("before writeFlush: channel is not writable in channelRead0");
+            }
+
+            ctx.writeAndFlush(resp,
                     ctx.voidPromise());
             return;
         } catch (NumberFormatException e) {
-            ctx.channel().writeAndFlush(BAD_REQ);
+            ctx.writeAndFlush(BAD_REQ);
             return;
         }
     }
