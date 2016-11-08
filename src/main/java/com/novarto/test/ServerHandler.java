@@ -100,8 +100,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
+        ctx.fireExceptionCaught(cause);
     }
 
     public static FullHttpResponse ok(Object o) {
