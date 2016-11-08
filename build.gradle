@@ -1,0 +1,40 @@
+group 'com.novarto'
+version '0.1-SNAPSHOT'
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '3.1'
+  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+def jackson_version = '2.7.4'
+
+dependencies {
+    compile "io.netty:netty-codec-http2:4.1.4.Final"
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
+
+    compile "com.fasterxml.jackson.core:jackson-core:$jackson_version"
+    compile "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
+    compile "com.fasterxml.jackson.module:jackson-module-afterburner:$jackson_version"
+    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:$jackson_version"
+}
+
+
+apply plugin: "application"
+mainClassName = "com.novarto.test.Main"
+
+run {
+    applicationDefaultJvmArgs += ["-Xms2g", "-Xmx2g", "-server"]
+    if(java.lang.System.getProperty("backpressure")!=null)
+    {
+        applicationDefaultJvmArgs += "-Dbackpressure"
+    }
+}
