@@ -36,14 +36,15 @@ public class Main {
                 ));
             }
 
-            Channel ch = b.bind(8080).sync().channel();
+            int port = getPort();
+            Channel ch = b.bind(port).sync().channel();
 
             if(backpressureEnabled)
             {
                 System.out.println("Backpressure enabled");
             }
             System.out.println("Open your web browser and navigate to " +
-                    "http://127.0.0.1:8080");
+                    "http://127.0.0.1:"+ port);
 
             ch.closeFuture().sync();
         } finally {
@@ -51,5 +52,10 @@ public class Main {
             workerGroup.shutdownGracefully();
             System.out.println("Server shutdown successfully");
         }
+    }
+
+    private static int getPort()
+    {
+        return Integer.parseInt(System.getProperty("port", "8080"));
     }
 }

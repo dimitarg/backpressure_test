@@ -43,4 +43,9 @@ run {
         applicationDefaultJvmArgs += ["-Xms$mem", "-Xmx$mem"]
     }
     applicationDefaultJvmArgs += "-server"
+
+    if(java.lang.System.getProperty("port")!=null)
+    {
+        applicationDefaultJvmArgs += "-Dport=${java.lang.System.getProperty("port")}"
+    }
 }
