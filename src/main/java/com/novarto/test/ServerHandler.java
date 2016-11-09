@@ -3,6 +3,7 @@ package com.novarto.test;
 import com.novarto.test.json.OptimizedJacksonEncoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -25,7 +26,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         this.enableBackPressure = enableBackPressure;
     }
 
-    private static final OptimizedJacksonEncoder ENC = new OptimizedJacksonEncoder(PooledByteBufAllocator.DEFAULT);
     private static final FullHttpResponse BAD_REQ = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST);
 
     static {
@@ -64,6 +64,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             System.err.println("channel is not writable in channelRead0");
         }
 
+        if(msg.uri().equals("/static"))
+        {
+            ctx.writeAndFlush(ok(Unpooled.wrappedBuffer(Config.STATIC_RESPONSE)));
+            return;
+        }
+
         QueryStringDecoder d = new QueryStringDecoder(msg.uri());
         List<String> sizeParam = d.parameters().get("size");
 
@@ -83,7 +89,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
                 result.add(new Bean(i, String.valueOf(i)));
             }
 
-            FullHttpResponse resp = ok(result);
+            FullHttpResponse resp = okJson(result);
             if(!ctx.channel().isWritable())
             {
                 System.err.println("before writeFlush: channel is not writable in channelRead0");
@@ -103,9 +109,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         ctx.fireExceptionCaught(cause);
     }
 
-    public static FullHttpResponse ok(Object o) {
+    public static FullHttpResponse okJson(Object o) {
 
-        ByteBuf payload = ENC.encode(o);
+       return ok(Config.ENC.encode(o));
+
+    }
+
+    public static FullHttpResponse ok(ByteBuf payload) {
+
         final FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, payload);
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());

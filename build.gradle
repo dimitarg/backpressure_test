@@ -48,4 +48,9 @@ run {
     {
         applicationDefaultJvmArgs += "-Dport=${java.lang.System.getProperty("port")}"
     }
+
+    if(java.lang.System.getProperty("staticSize")!=null)
+    {
+        applicationDefaultJvmArgs += "-DstaticSize=${java.lang.System.getProperty("staticSize")}"
+    }
 }
