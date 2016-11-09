@@ -26,6 +26,10 @@ dependencies {
     compile "com.fasterxml.jackson.module:jackson-module-afterburner:$jackson_version"
     compile "com.fasterxml.jackson.module:jackson-module-parameter-names:$jackson_version"
 
+    compile 'org.slf4j:slf4j-api:1.7.21'
+    runtime 'ch.qos.logback:logback-core:1.1.7'
+    runtime 'ch.qos.logback:logback-classic:1.1.7'
+
 }
 
 

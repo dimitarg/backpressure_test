@@ -8,6 +8,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
 
+import static com.novarto.test.Config.LOGGER;
+
 /**
  * Created by fmap on 08.11.16.
  */
@@ -36,22 +38,21 @@ public class Main {
 
             printEnv();
 
-            System.out.println("Open your web browser and navigate to " +
-                    "http://127.0.0.1:"+ port);
+            LOGGER.info("Open your web browser and navigate to " +
+                    "http://127.0.0.1:{}", port);
 
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
-            System.out.println("Server shutdown successfully");
+            LOGGER.info("Server shutdown successfully");
         }
     }
 
     private static void printEnv() {
-        System.out.println("Configuration:");
-        System.out.println(Config.asString());
-        System.out.println("leak detection level: " + ResourceLeakDetector.getLevel());
-        System.out.println();
+        LOGGER.info("Configuration:");
+        LOGGER.info(Config.asString());
+        LOGGER.info("leak detection level: " + ResourceLeakDetector.getLevel());
     }
 
 

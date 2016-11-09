@@ -12,6 +12,8 @@ import io.netty.handler.codec.http.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.novarto.test.Config.LOGGER;
+
 /**
  * Created by fmap on 08.11.16.
  */
@@ -41,9 +43,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             boolean writable = ctx.channel().isWritable();
             ctx.channel().config().setAutoRead(writable);
 
-            //        String msg = writable ? "writability changed to true. Bytes before unwritable: " + ctx.channel().bytesBeforeUnwritable() :
-            //                "writability changed to false, bytes before writable: " + ctx.channel().bytesBeforeWritable();
-            //        System.out.println(msg)
+            logWritabilityChange(ctx, writable);
         }
 
 
@@ -56,12 +56,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
         if(!ctx.channel().config().isAutoRead())
         {
-            System.err.println("autoread is false in channelRead0");
+            LOGGER.warn("autoread is false in channelRead0");
         }
 
         if(!ctx.channel().isWritable())
         {
-            System.err.println("channel is not writable in channelRead0");
+            LOGGER.warn("channel is not writable in channelRead0");
         }
 
         if(msg.uri().equals("/static"))
@@ -92,7 +92,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             FullHttpResponse resp = okJson(result);
             if(!ctx.channel().isWritable())
             {
-                System.err.println("before writeFlush: channel is not writable in channelRead0");
+                LOGGER.warn("before writeFlush: channel is not writable in channelRead0");
             }
 
             ctx.writeAndFlush(resp,
@@ -122,5 +122,21 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
         return response;
 
+    }
+
+    private void logWritabilityChange(ChannelHandlerContext ctx, boolean writable) {
+        if(LOGGER.isDebugEnabled())
+        {
+            if(writable)
+            {
+                LOGGER.debug("writability changed to true. Bytes before unwritable: {}",
+                        ctx.channel().bytesBeforeUnwritable());
+            }
+            else
+            {
+                LOGGER.debug("writability changed to false, bytes before writable: {}",
+                        ctx.channel().bytesBeforeWritable());
+            }
+        }
     }
 }

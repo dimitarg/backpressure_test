@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.novarto.test.json.OptimizedJacksonEncoder;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.WriteBufferWaterMark;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.List;
  * Created by fmap on 09.11.16.
  */
 public class Config {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger("com.novarto.test");
 
     public static final WriteBufferWaterMark WRITE_WATER_MARK = new WriteBufferWaterMark(
             16 * 1024,
