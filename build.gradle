@@ -17,7 +17,7 @@ repositories {
 def jackson_version = '2.7.4'
 
 dependencies {
-    compile "io.netty:netty-codec-http2:4.1.4.Final"
+    compile "io.netty:netty-codec-http2:4.1.6.Final"
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
 
