@@ -14,16 +14,14 @@ import java.util.List;
 /**
  * Created by fmap on 09.11.16.
  */
-public class Config {
+public class Config
+{
 
     public static final Logger LOGGER = LoggerFactory.getLogger("com.novarto.test");
 
-    public static final WriteBufferWaterMark WRITE_WATER_MARK = new WriteBufferWaterMark(
-            16 * 1024,
-            32 * 1024
-    );
+    public static final WriteBufferWaterMark WRITE_WATER_MARK = new WriteBufferWaterMark(16 * 1024, 32 * 1024);
 
-    public static final boolean BACKPRESSURE_ENABLED = System.getProperty("backpressure")!=null;
+    public static final boolean BACKPRESSURE_ENABLED = System.getProperty("backpressure") != null;
 
     public static final int PORT = getIntProp("port", 8080);
 
@@ -37,21 +35,24 @@ public class Config {
     public static int STATIC_RESP_SIZE = getIntProp("staticSize", 5000);
 
     public static final byte[] STATIC_RESPONSE;
+
     static
     {
 
         List<Bean> xs = new ArrayList<>();
 
-        for(long i=0;i<STATIC_RESP_SIZE;i++)
+        for (long i = 0; i < STATIC_RESP_SIZE; i++)
         {
             xs.add(new Bean(i, String.valueOf(i)));
         }
 
-
-        try {
+        try
+        {
             STATIC_RESPONSE = ENC.mapper.writeValueAsString(xs).getBytes(StandardCharsets.UTF_8);
 
-        } catch (JsonProcessingException e) {
+        }
+        catch (JsonProcessingException e)
+        {
             throw new RuntimeException(e);
         }
     }
@@ -60,9 +61,8 @@ public class Config {
     {
 
         return new StringBuilder().append("BACKPRESSURE_ENABLED: ").append(BACKPRESSURE_ENABLED).append(System.lineSeparator())
-                .append("PORT: ").append(PORT).append(System.lineSeparator())
-                .append("STATIC_RESP_SIZE: ").append(STATIC_RESP_SIZE).append(System.lineSeparator())
-                .append("WRITE_WATER_MARK: ").append(WRITE_WATER_MARK).append(System.lineSeparator())
-                .toString();
+                .append("PORT: ").append(PORT).append(System.lineSeparator()).append("STATIC_RESP_SIZE: ")
+                .append(STATIC_RESP_SIZE).append(System.lineSeparator()).append("WRITE_WATER_MARK: ").append(WRITE_WATER_MARK)
+                .append(System.lineSeparator()).toString();
     }
 }

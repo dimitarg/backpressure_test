@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
  * This Jackson implementation of {@link JsonEncoder} uses the afterburner module
  * plus the custom {@link ByteBufArrayBuilder} which allows us to write directly to the reference
  * counted netty's {@link ByteBuf}
- *
+ * <p>
  * Created by Borislav Ivanov on 7/7/15.
  */
 public class OptimizedJacksonEncoder extends JsonEncoder
@@ -33,8 +33,7 @@ public class OptimizedJacksonEncoder extends JsonEncoder
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
-    @Override
-    public ByteBuf encode(Object o)
+    @Override public ByteBuf encode(Object o)
     {
         try
         {
@@ -46,8 +45,7 @@ public class OptimizedJacksonEncoder extends JsonEncoder
         }
     }
 
-    @Override
-    public <T> T decode(ByteBuf o, Class<T> c)
+    @Override public <T> T decode(ByteBuf o, Class<T> c)
     {
         try
         {

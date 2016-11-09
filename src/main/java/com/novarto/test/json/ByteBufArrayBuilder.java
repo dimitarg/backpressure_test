@@ -10,7 +10,7 @@ import java.util.LinkedList;
 /**
  * This class is exact copy of {@link com.fasterxml.jackson.core.util.ByteArrayBuilder}. The method
  * toByteArray of the original file were re-written to use netty's {@link ByteBuf} to avoid allocation
- *
+ * <p>
  * Created by Borislav Ivanov on 7/6/15.
  */
 public class ByteBufArrayBuilder extends OutputStream
@@ -77,6 +77,7 @@ public class ByteBufArrayBuilder extends OutputStream
         }
         currBlock[currBlockPtr++] = (byte) i;
     }
+
     /**
      * Method called when results are finalized and we can get the
      * full aggregated result buffer to return to the caller
@@ -115,16 +116,12 @@ public class ByteBufArrayBuilder extends OutputStream
         return result;
     }
 
-
-
-    @Override
-    public void write(byte[] b)
+    @Override public void write(byte[] b)
     {
         write(b, 0, b.length);
     }
 
-    @Override
-    public void write(byte[] b, int off, int len)
+    @Override public void write(byte[] b, int off, int len)
     {
         while (true)
         {
@@ -145,18 +142,15 @@ public class ByteBufArrayBuilder extends OutputStream
         }
     }
 
-    @Override
-    public void write(int b)
+    @Override public void write(int b)
     {
         append(b);
     }
 
-    @Override
-    public void close()
+    @Override public void close()
     { /* NOP */ }
 
-    @Override
-    public void flush()
+    @Override public void flush()
     { /* NOP */ }
 
     /*

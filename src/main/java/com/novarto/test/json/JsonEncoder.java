@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * If you create a custom {@link JsonEncoder} please make sure that it is thread safe
- *
+ * <p>
  * Created by Borislav Ivanov on 7/7/15.
  */
 public abstract class JsonEncoder

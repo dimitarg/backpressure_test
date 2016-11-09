@@ -13,22 +13,23 @@ import static com.novarto.test.Config.LOGGER;
 /**
  * Created by fmap on 08.11.16.
  */
-public class Main {
+public class Main
+{
 
-    public static void main(String[] args) throws InterruptedException {
-
+    public static void main(String[] args) throws InterruptedException
+    {
 
         // Configure the server.
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
+        try
+        {
             ServerBootstrap b = new ServerBootstrap();
             b.option(ChannelOption.SO_BACKLOG, 1024);
-            b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
+            b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                     .childHandler(new ServerInitializer(Config.BACKPRESSURE_ENABLED));
 
-            if(Config.BACKPRESSURE_ENABLED)
+            if (Config.BACKPRESSURE_ENABLED)
             {
                 b.childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, Config.WRITE_WATER_MARK);
             }
@@ -38,22 +39,23 @@ public class Main {
 
             printEnv();
 
-            LOGGER.info("Open your web browser and navigate to " +
-                    "http://127.0.0.1:{}", port);
+            LOGGER.info("Open your web browser and navigate to " + "http://127.0.0.1:{}", port);
 
             ch.closeFuture().sync();
-        } finally {
+        }
+        finally
+        {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
             LOGGER.info("Server shutdown successfully");
         }
     }
 
-    private static void printEnv() {
+    private static void printEnv()
+    {
         LOGGER.info("Configuration:");
         LOGGER.info(Config.asString());
         LOGGER.info("leak detection level: " + ResourceLeakDetector.getLevel());
     }
-
 
 }

@@ -17,9 +17,8 @@ import static com.novarto.test.Config.LOGGER;
 /**
  * Created by fmap on 08.11.16.
  */
-@ChannelHandler.Sharable
-public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
-
+@ChannelHandler.Sharable public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest>
+{
 
     private final boolean enableBackPressure;
 
@@ -28,17 +27,18 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         this.enableBackPressure = enableBackPressure;
     }
 
-    private static final FullHttpResponse BAD_REQ = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST);
+    private static final FullHttpResponse BAD_REQ = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+            HttpResponseStatus.BAD_REQUEST);
 
-    static {
+    static
+    {
         BAD_REQ.headers().add(HttpHeaderNames.CONTENT_LENGTH, 0);
     }
 
-    @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+    @Override public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception
+    {
 
-
-        if(enableBackPressure)
+        if (enableBackPressure)
         {
             boolean writable = ctx.channel().isWritable();
             ctx.channel().config().setAutoRead(writable);
@@ -46,25 +46,23 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             logWritabilityChange(ctx, writable);
         }
 
-
-;
+        ;
     }
 
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
+    @Override protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception
+    {
 
-
-        if(!ctx.channel().config().isAutoRead())
+        if (!ctx.channel().config().isAutoRead())
         {
             LOGGER.warn("autoread is false in channelRead0");
         }
 
-        if(!ctx.channel().isWritable())
+        if (!ctx.channel().isWritable())
         {
             LOGGER.warn("channel is not writable in channelRead0");
         }
 
-        if(msg.uri().equals("/static"))
+        if (msg.uri().equals("/static"))
         {
             ctx.writeAndFlush(ok(Unpooled.wrappedBuffer(Config.STATIC_RESPONSE)));
             return;
@@ -73,49 +71,53 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         QueryStringDecoder d = new QueryStringDecoder(msg.uri());
         List<String> sizeParam = d.parameters().get("size");
 
-        if (sizeParam == null || sizeParam.size() == 0) {
+        if (sizeParam == null || sizeParam.size() == 0)
+        {
             ctx.writeAndFlush(BAD_REQ.copy());
             return;
         }
 
-
-        try {
+        try
+        {
             long size = Long.parseLong(sizeParam.get(0));
-
 
             List<Bean> result = new ArrayList<>();
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; i++)
+            {
                 result.add(new Bean(i, String.valueOf(i)));
             }
 
             FullHttpResponse resp = okJson(result);
-            if(!ctx.channel().isWritable())
+            if (!ctx.channel().isWritable())
             {
                 LOGGER.warn("before writeFlush: channel is not writable in channelRead0");
             }
 
-            ctx.writeAndFlush(resp,
-                    ctx.voidPromise());
+            ctx.writeAndFlush(resp, ctx.voidPromise());
             return;
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e)
+        {
             ctx.writeAndFlush(BAD_REQ);
             return;
         }
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    @Override public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+    {
         ctx.fireExceptionCaught(cause);
     }
 
-    public static FullHttpResponse okJson(Object o) {
+    public static FullHttpResponse okJson(Object o)
+    {
 
-       return ok(Config.ENC.encode(o));
+        return ok(Config.ENC.encode(o));
 
     }
 
-    public static FullHttpResponse ok(ByteBuf payload) {
+    public static FullHttpResponse ok(ByteBuf payload)
+    {
 
         final FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, payload);
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
@@ -124,18 +126,17 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
     }
 
-    private void logWritabilityChange(ChannelHandlerContext ctx, boolean writable) {
-        if(LOGGER.isDebugEnabled())
+    private void logWritabilityChange(ChannelHandlerContext ctx, boolean writable)
+    {
+        if (LOGGER.isDebugEnabled())
         {
-            if(writable)
+            if (writable)
             {
-                LOGGER.debug("writability changed to true. Bytes before unwritable: {}",
-                        ctx.channel().bytesBeforeUnwritable());
+                LOGGER.debug("writability changed to true. Bytes before unwritable: {}", ctx.channel().bytesBeforeUnwritable());
             }
             else
             {
-                LOGGER.debug("writability changed to false, bytes before writable: {}",
-                        ctx.channel().bytesBeforeWritable());
+                LOGGER.debug("writability changed to false, bytes before writable: {}", ctx.channel().bytesBeforeWritable());
             }
         }
     }

@@ -11,14 +11,14 @@ import java.io.IOException;
 
 /**
  * Object mapper that uses {@link ByteBufArrayBuilder} to allow serialization to netty's {@link ByteBuf} to avoid allocation
- *
+ * <p>
  * Created by Borislav Ivanov on 7/6/15.
  */
 public class ByteBufObjectMapper extends ObjectMapper
 {
     private static final long serialVersionUID = 1;
 
-    private  transient  ByteBufAllocator allocator;
+    private transient ByteBufAllocator allocator;
 
     public ByteBufObjectMapper(ByteBufAllocator allocator)
     {
