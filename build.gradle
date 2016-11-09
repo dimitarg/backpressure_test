@@ -25,6 +25,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
     compile "com.fasterxml.jackson.module:jackson-module-afterburner:$jackson_version"
     compile "com.fasterxml.jackson.module:jackson-module-parameter-names:$jackson_version"
+
 }
 
 
@@ -32,9 +33,14 @@ apply plugin: "application"
 mainClassName = "com.novarto.test.Main"
 
 run {
-    applicationDefaultJvmArgs += ["-Xms2g", "-Xmx2g", "-server"]
     if(java.lang.System.getProperty("backpressure")!=null)
     {
         applicationDefaultJvmArgs += "-Dbackpressure"
     }
+    if(java.lang.System.getProperty("mem")!=null)
+    {
+        String mem = java.lang.System.getProperty("mem")
+        applicationDefaultJvmArgs += ["-Xms$mem", "-Xmx$mem"]
+    }
+    applicationDefaultJvmArgs += "-server"
 }
