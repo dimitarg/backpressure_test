@@ -4,9 +4,9 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.ResourceLeakDetector;
 
 /**
  * Created by fmap on 08.11.16.
@@ -34,10 +34,8 @@ public class Main {
             int port = Config.PORT;
             Channel ch = b.bind(port).sync().channel();
 
-            if(Config.BACKPRESSURE_ENABLED)
-            {
-                System.out.println("Backpressure enabled");
-            }
+            printEnv();
+
             System.out.println("Open your web browser and navigate to " +
                     "http://127.0.0.1:"+ port);
 
@@ -49,6 +47,12 @@ public class Main {
         }
     }
 
+    private static void printEnv() {
+        System.out.println("Configuration:");
+        System.out.println(Config.asString());
+        System.out.println("leak detection level: " + ResourceLeakDetector.getLevel());
+        System.out.println();
+    }
 
 
 }

@@ -33,24 +33,34 @@ apply plugin: "application"
 mainClassName = "com.novarto.test.Main"
 
 run {
-    if(java.lang.System.getProperty("backpressure")!=null)
-    {
-        applicationDefaultJvmArgs += "-Dbackpressure"
-    }
+
+
+    applicationDefaultJvmArgs += "-server"
+
     if(java.lang.System.getProperty("mem")!=null)
     {
         String mem = java.lang.System.getProperty("mem")
         applicationDefaultJvmArgs += ["-Xms$mem", "-Xmx$mem"]
     }
-    applicationDefaultJvmArgs += "-server"
 
-    if(java.lang.System.getProperty("port")!=null)
-    {
-        applicationDefaultJvmArgs += "-Dport=${java.lang.System.getProperty("port")}"
-    }
+    appendToArgs("backpressure")
+    appendToArgs("port")
+    appendToArgs("staticSize")
+    appendToArgs("io.netty.leakDetection.level")
+}
 
-    if(java.lang.System.getProperty("staticSize")!=null)
+private def appendToArgs(propName)
+{
+    def value = java.lang.System.getProperty(propName);
+    if(value!=null)
     {
-        applicationDefaultJvmArgs += "-DstaticSize=${java.lang.System.getProperty("staticSize")}"
+        if(value.isEmpty())
+        {
+            applicationDefaultJvmArgs += "-D${propName}"
+        }
+        else
+        {
+            applicationDefaultJvmArgs += "-D${propName}=${value}"
+        }
     }
 }

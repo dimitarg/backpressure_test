@@ -30,6 +30,7 @@ public class Config {
         return Integer.parseInt(System.getProperty(propName, String.valueOf(defaultV)));
     }
 
+    public static int STATIC_RESP_SIZE = getIntProp("staticSize", 5000);
 
     public static final byte[] STATIC_RESPONSE;
     static
@@ -37,8 +38,7 @@ public class Config {
 
         List<Bean> xs = new ArrayList<>();
 
-        int size = getIntProp("staticSize", 5000);
-        for(long i=0;i<size;i++)
+        for(long i=0;i<STATIC_RESP_SIZE;i++)
         {
             xs.add(new Bean(i, String.valueOf(i)));
         }
@@ -50,5 +50,15 @@ public class Config {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String asString()
+    {
+
+        return new StringBuilder().append("BACKPRESSURE_ENABLED: ").append(BACKPRESSURE_ENABLED).append(System.lineSeparator())
+                .append("PORT: ").append(PORT).append(System.lineSeparator())
+                .append("STATIC_RESP_SIZE: ").append(STATIC_RESP_SIZE).append(System.lineSeparator())
+                .append("WRITE_WATER_MARK: ").append(WRITE_WATER_MARK).append(System.lineSeparator())
+                .toString();
     }
 }
