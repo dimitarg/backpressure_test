@@ -8,6 +8,9 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.novarto.test.Config.BACKPRESSURE_ENABLED;
 import static com.novarto.test.Config.LOGGER;
 
 /**
@@ -27,12 +30,13 @@ public class Main
             ServerBootstrap b = new ServerBootstrap();
             b.option(ChannelOption.SO_BACKLOG, 1024);
             b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                    .childHandler(new ServerInitializer(Config.BACKPRESSURE_ENABLED));
+                    .childHandler(new ServerInitializer());
 
-            if (Config.BACKPRESSURE_ENABLED)
+            if (BACKPRESSURE_ENABLED)
             {
                 b.childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, Config.WRITE_WATER_MARK);
             }
+
 
             int port = Config.PORT;
             Channel ch = b.bind(port).sync().channel();
@@ -47,6 +51,9 @@ public class Main
         {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
+            Config.TRAFFIC_SHAPER.release();
+            Config.TSH_EXECUTOR.awaitTermination(5, TimeUnit.SECONDS);
+
             LOGGER.info("Server shutdown successfully");
         }
     }

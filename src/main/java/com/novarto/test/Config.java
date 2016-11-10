@@ -4,12 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.novarto.test.json.OptimizedJacksonEncoder;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.WriteBufferWaterMark;
+import io.netty.handler.traffic.GlobalTrafficShapingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by fmap on 09.11.16.
@@ -34,6 +37,8 @@ public class Config
 
     public static int STATIC_RESP_SIZE = getIntProp("staticSize", 5000);
 
+    public static int WRITE_LIMIT_MBYTES_PS = getIntProp("writeLimit", 13);
+
     public static final byte[] STATIC_RESPONSE;
 
     static
@@ -57,12 +62,24 @@ public class Config
         }
     }
 
+
+
+    public static final ServerHandler SERVER_HANDLER = new ServerHandler(BACKPRESSURE_ENABLED);
+
+    public static final ScheduledExecutorService TSH_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
+
+    public static final GlobalTrafficShapingHandler TRAFFIC_SHAPER = new GlobalTrafficShapingHandler(
+            TSH_EXECUTOR,  WRITE_LIMIT_MBYTES_PS * 1024 * 1024, 0,
+            1000, 5000
+    );
+
     public static String asString()
     {
 
         return new StringBuilder().append("BACKPRESSURE_ENABLED: ").append(BACKPRESSURE_ENABLED).append(System.lineSeparator())
                 .append("PORT: ").append(PORT).append(System.lineSeparator()).append("STATIC_RESP_SIZE: ")
                 .append(STATIC_RESP_SIZE).append(System.lineSeparator()).append("WRITE_WATER_MARK: ").append(WRITE_WATER_MARK)
+                .append("WRITE LIMIT IN MEGABYTES / S: ").append(WRITE_LIMIT_MBYTES_PS).append(System.lineSeparator())
                 .append(System.lineSeparator()).toString();
     }
 }

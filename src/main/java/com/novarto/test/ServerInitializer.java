@@ -12,18 +12,15 @@ import io.netty.handler.flow.FlowControlHandler;
 public class ServerInitializer extends ChannelInitializer<SocketChannel>
 {
 
-    private final boolean enableBackPressure;
-
-    public ServerInitializer(boolean enableBackPressure)
-    {
-        this.enableBackPressure = enableBackPressure;
-    }
-
     @Override protected void initChannel(SocketChannel ch) throws Exception
     {
+        if(Config.BACKPRESSURE_ENABLED)
+        {
+            ch.pipeline().addLast(Config.TRAFFIC_SHAPER);
+        }
         ch.pipeline().addLast(new HttpServerCodec());
         ch.pipeline().addLast(new HttpObjectAggregator(1024 * 1000));
-        ch.pipeline().addLast(new ServerHandler(enableBackPressure));
+        ch.pipeline().addLast(Config.SERVER_HANDLER);
         ch.pipeline().addLast(new ErrorHandler());
     }
 }

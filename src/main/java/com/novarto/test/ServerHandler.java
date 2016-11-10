@@ -1,8 +1,6 @@
 package com.novarto.test;
 
-import com.novarto.test.json.OptimizedJacksonEncoder;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -46,7 +44,6 @@ import static com.novarto.test.Config.LOGGER;
             logWritabilityChange(ctx, writable);
         }
 
-        ;
     }
 
     @Override protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception
